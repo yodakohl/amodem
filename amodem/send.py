@@ -22,6 +22,11 @@ class Sender(object):
         self.padding = [0] * config.bits_per_baud
         self.equalizer = equalizer.Equalizer(config)
 
+        symbols = self.equalizer.train_symbols(equalizer.equalizer_length)
+        self.signal = self.equalizer.modulator(symbols)
+        self.result = [self.pilot *value for value in equalizer.prefix]
+
+
     def write(self, sym):
         sym = np.array(sym) * self.gain
         data = common.dumps(sym)
@@ -29,13 +34,10 @@ class Sender(object):
         self.offset += len(sym)
 
     def start(self):
-        symbols = self.equalizer.train_symbols(equalizer.equalizer_length)
-        signal = self.equalizer.modulator(symbols)
-        result = [self.pilot *value for value in equalizer.prefix]
 
-        self.write(result)
+        self.write(self.result)
         self.write(self.silence)
-        self.write(signal)
+        self.write(self.signal)
         self.write(self.silence)
 
     def modulate(self, bits):
