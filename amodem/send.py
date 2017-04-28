@@ -29,11 +29,11 @@ class Sender(object):
         self.offset += len(sym)
 
     def start(self):
-        for value in equalizer.prefix:
-            self.write(self.pilot * value)
-
         symbols = self.equalizer.train_symbols(equalizer.equalizer_length)
         signal = self.equalizer.modulator(symbols)
+        result = [self.pilot *value for value in equalizer.prefix]
+
+        self.write(result)
         self.write(self.silence)
         self.write(signal)
         self.write(self.silence)
@@ -47,3 +47,4 @@ class Sender(object):
             if i % self.iters_per_report == 0:
                 total_bits = i * Nfreq * self.modem.bits_per_symbol
                 log.debug('Sent %10.3f kB', total_bits / 8e3)
+
