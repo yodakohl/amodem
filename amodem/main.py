@@ -13,9 +13,6 @@ def send(config, src, dst, gain=1.0):
     Fs = config.Fs
 
     # pre-padding audio with silence (priming the audio sending queue)
-    sender.write(np.zeros(int(Fs * config.silence_start)))
-
-    sender.start()
 
     training_duration = sender.offset
     log.info('Sending %.3f seconds of training audio', training_duration / Fs)
@@ -24,6 +21,11 @@ def send(config, src, dst, gain=1.0):
     data = itertools.chain.from_iterable(reader)
     bits = framing.encode(data)
     log.info('Starting modulation')
+
+    sender.write(np.zeros(int(Fs * config.silence_start)))
+
+    sender.start()
+
     sender.modulate(bits=bits)
 
     data_duration = sender.offset - training_duration
