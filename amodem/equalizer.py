@@ -15,12 +15,12 @@ class Equalizer(object):
         self.Nsym = config.Nsym
 
     def train_symbols(self, length, constant_prefix=16):
-        r = dsp.prbs(reg=1, poly=0x1100b, bits=2)
+        random = dsp.prbs(reg=1, poly=0x1100b, bits=2)
         constellation = [1, 1j, -1, -1j]
 
         symbols = []
         for _ in range(length):
-            symbols.append([constellation[next(r)] for _ in range(self.Nfreq)])
+            symbols.append([constellation[next(random)] for _ in range(self.Nfreq)])
 
         symbols = np.array(symbols)
         # Constant symbols (for analog debugging)
